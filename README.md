@@ -47,11 +47,11 @@ Explain how to set up the project locally.
 
 ### Prerequisites
 
-List any prerequisites that users need to have installed on their systems before they can use your project.
-
-- Java SDK
-- Spring Boot
-- ...
+1. **Java SDK:** The project is built using Java, and having the appropriate Java Development Kit (JDK) is essential.
+2. **Spring Boot:** Since the project is a Spring Boot application, you need to have Spring Boot installed. You can typically include the Spring Boot dependencies in your project, or users can install it globally on their systems.
+3. **Database:** Depending on your project's configuration, You can go with MySQL, PostgreSQL, or H2.
+4. **Integrated Development Environment (IDE):** It's not mandatory, but using an IDE like Eclipse, IntelliJ IDEA, or VS Code can enhance the development experience.
+5. **Build Tool (Optional):** A build tool like Maven or Gradle, You may need to have it installed to manage dependencies  and build the project.
 
 ### Installation
 
