@@ -15,7 +15,11 @@ Imagine a vibrant Spring Boot Blog application! Users can register, create posts
 
 ## Overview
 
-Provide a high-level overview of your project. Explain its purpose, features, and any other relevant information.
+Our project is a Spring Boot-based Blog application designed for seamless content creation, sharing, and discovery. 
+The main purpose is to provide users with a platform to register, create, and manage their posts across various categories. 
+Admins have additional control over user and post management, ensuring a secure and well-moderated environment. 
+Key features include user authentication, profile management, category exploration, and advanced post search functionality. 
+The project is structured for simplicity, security, and an engaging user experience.
 
 ## Features
 
