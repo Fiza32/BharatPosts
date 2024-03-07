@@ -1,0 +1,93 @@
+# STS (Spring Tool Suite) specific
+.springBeans
+.metadata
+.tmp
+.settings
+
+# Compiled Java class files
+*.class
+
+# Log files
+*.log
+
+# Bytecode
+*.jar
+
+# Compiled source files
+bin/
+target/
+
+# Package files
+*.war
+*.ear
+*.nar
+*.har
+*.zip
+*.tar.gz
+*.rar
+
+# Eclipse specific files
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA specific files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Maven specific files
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.backup
+/target/
+mvnw
+mvnw.cmd
+
+# Gradle specific files
+.gradle/
+build/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# IntelliJ IDEA files
+.idea/
+
+# Visual Studio Code files
+.vscode/
+
+# Eclipse files
+*.pydevproject
+.project
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
