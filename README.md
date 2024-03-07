@@ -19,11 +19,23 @@ Provide a high-level overview of your project. Explain its purpose, features, an
 
 ## Features
 
-List the key features of your project. What makes it stand out? Use bullet points for clarity.
+### Users Features:
 
-- Feature 1
-- Feature 2
-- ...
+- Users can register by providing necessary details.
+- Users can create, update, and delete their profiles.
+- Users can create, update, and delete their posts.
+- Users can view  all available post Categories
+- Users can view posts, search for a post by its ID, and search for posts containing a specific keyword, and view paginated posts with sorting options
+- Users can create and delete Comments on posts.
+
+### Admin Features:
+- Admins can perform CRUD operations on users and posts.
+- Admins can manage post categories by creating, updating and deleting categories.
+- Admins can view and delete comments on posts.
+- Admins can implement security measures like role-based access control.
+
+### Common Features:
+- Both users and admins can obtain a new authentication token by providing the expired token
 
 ## Getting Started
 
