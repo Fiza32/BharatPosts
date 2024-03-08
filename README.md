@@ -98,3 +98,53 @@ This command starts the Spring Boot application. Once the application is running
 
 **Step 7: Test the Application**
 - Test Various features of your application to ensure that it's working as expected.
+
+## Contributing
+
+### Coding Standards
+Please adhere to the following coding standards:
+- Java Style: Follow the [Java Code Conventions](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html)
+- Spring Boot Best Practices: Refer to [Spring Boot Best Practices](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-developing-web-applications)
+
+### Contribution Process
+**Step 1: Fork the Repository:**
+- Fork the project on GitHub
+
+**Step 2: Create a Branch**
+- Create a new branch for your contribution:
+```bash
+git checkout -b feature/your-feature
+```
+
+**Step 3: Make Changes:**
+- Make your changes, following the coding standards.
+
+**Step 4: Test Your Changes:**
+- Test your changes thoroughly to ensure they don't introduce issues.
+
+**Step 5: Commit Your Changes:**
+- Commit your changes with a clear and concise commit message.
+
+**Step 6: Push Changes:**
+- Push your changes to your forked repository:
+```bash
+git push origin feature/your-feature
+```
+
+You can replace "your-feature" with a concise and descriptive name related to the specific change or addition you are making to the project.
+
+**Step 7: Create a Pull Request:**
+- Create a pull request from your branch to the main repository.
+- Provide a clear title and description for your changes.
+
+**Step 8: Review:**
+- Your pull request will be reviewed, and feedback or changes may be requested.
+
+**Step 9:**
+- Once approved, your changes will be merged into the main branch.
+
+**Thank You for contributing! We appreciate your effort in making our project better.**
+
+
+
+
