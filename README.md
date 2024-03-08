@@ -103,8 +103,8 @@ This command starts the Spring Boot application. Once the application is running
 
 ### Coding Standards
 Please adhere to the following coding standards:
-- Java Style: Follow the [Java Code Conventions](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html){:target="_blank"}
-- Spring Boot Best Practices: Refer to [Spring Boot Best Practices](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-developing-web-applications){:target="_blank"}
+- Java Style: Follow the [Java Code Conventions](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html)
+- Spring Boot Best Practices: Refer to [Spring Boot Best Practices](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-developing-web-applications)
 
 ### Contribution Process
 **Step 1: Fork the Repository:**
