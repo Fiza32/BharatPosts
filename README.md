@@ -43,6 +43,16 @@ The project is structured for simplicity, security, and an engaging user experie
 
 ## Getting Started
 
+### Prerequisites
+
+1. **Java SDK:** The project is built using Java, and having the appropriate Java Development Kit (JDK) is essential.
+2. **Spring Boot:** Since the project is a Spring Boot application, you need to have Spring Boot installed. You can typically include the Spring Boot dependencies in your project, or users can install it globally on their systems.
+3. **Database:** Depending on your project's configuration, You can go with MySQL, PostgreSQL, or H2.
+4. **Integrated Development Environment (IDE):** It's not mandatory, but using an IDE like Eclipse, IntelliJ IDEA, or VS Code can enhance the development experience.
+5. **Build Tool (Optional):** A build tool like Maven or Gradle, You may need to have it installed to manage dependencies  and build the project.
+
+### Installation
+
 Setting up the project locally involves a series of steps to ensure that al dependencies are installed, and the application can be run successfully.
 Here's a general guide:
 
@@ -88,26 +98,3 @@ This command starts the Spring Boot application. Once the application is running
 
 **Step 7: Test the Application**
 - Test Various features of your application to ensure that it's working as expected.
-
-### Prerequisites
-
-1. **Java SDK:** The project is built using Java, and having the appropriate Java Development Kit (JDK) is essential.
-2. **Spring Boot:** Since the project is a Spring Boot application, you need to have Spring Boot installed. You can typically include the Spring Boot dependencies in your project, or users can install it globally on their systems.
-3. **Database:** Depending on your project's configuration, You can go with MySQL, PostgreSQL, or H2.
-4. **Integrated Development Environment (IDE):** It's not mandatory, but using an IDE like Eclipse, IntelliJ IDEA, or VS Code can enhance the development experience.
-5. **Build Tool (Optional):** A build tool like Maven or Gradle, You may need to have it installed to manage dependencies  and build the project.
-
-### Installation
-
-Provide step-by-step instructions on how to install and configure the project.
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/your-project.git
-
-# Navigate to the project directory
-cd your-project
-
-# Run the application
-./mvnw spring-boot:run
-```
