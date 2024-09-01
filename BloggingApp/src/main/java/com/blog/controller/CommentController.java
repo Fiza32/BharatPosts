@@ -1,6 +1,5 @@
 package com.blog.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,28 +9,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.blog.exceptions.PostNotFoundException;
 import com.blog.payloads.ApiResponse;
 import com.blog.payloads.CommentDto;
 import com.blog.services.CommentService;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
+@RequiredArgsConstructor
 public class CommentController {
 	
-	@Autowired
-	private CommentService commentService;
+	private final CommentService commentService;
 	
-	@PostMapping("/post/{postId}/comments")
-	public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto, @PathVariable Integer postId) throws PostNotFoundException{
-		CommentDto createComment = this.commentService.createComment(commentDto, postId);
-		return new ResponseEntity<CommentDto>(createComment, HttpStatus.CREATED);
+	@PostMapping("/{postId}/comments")
+	public ResponseEntity<CommentDto> createComment(@RequestBody @Valid CommentDto commentDto, @PathVariable Integer postId) {
+		CommentDto createComment = commentService.createComment(commentDto, postId);
+		return new ResponseEntity<>(createComment, HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/post/comments/{commentId}")
-	public ResponseEntity<ApiResponse> deleteComment(@PathVariable Integer commentId) throws PostNotFoundException{
-		this.commentService.deleteComment(commentId);
+	@DeleteMapping("/comments/{commentId}")
+	public ResponseEntity<ApiResponse> deleteComment(@PathVariable Integer commentId) {
+		commentService.deleteComment(commentId);
 		
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Comment is deleted", true), HttpStatus.OK);
+		return new ResponseEntity<>(new ApiResponse("Comment has been deleted successfully.", true), HttpStatus.OK);
 	}
 }
