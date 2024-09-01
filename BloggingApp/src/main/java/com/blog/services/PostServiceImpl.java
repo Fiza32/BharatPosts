@@ -1,6 +1,7 @@
 package com.blog.services;
 
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class PostServiceImpl implements PostService {
 		
 		Post post = this.modelMapper.map(postDto, Post.class);
 		post.setImageName("default.png");
-		post.setAddedDate(new Date());
+		post.setPublishedDate(LocalDateTime.now());
 		post.setUser(user);
 		post.setCategory(category);
 		
