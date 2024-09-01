@@ -1,6 +1,5 @@
 package com.blog.services;
 
-import org.springframework.stereotype.Service;
 
 import com.blog.model.User;
 import com.blog.payloads.JwtAuthenticationResponse;
@@ -10,7 +9,6 @@ import com.blog.payloads.SignInRequest;
 import com.blog.payloads.SignUpRequest;
 
 
-@Service
 public interface AuthenticationService {
 	User signUp(SignUpRequest request);
 	JwtAuthenticationResponse signIn(SignInRequest request);
