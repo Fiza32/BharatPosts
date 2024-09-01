@@ -1,104 +1,105 @@
 package com.blog.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.blog.exceptions.DuplicateDataFoundException;
 import com.blog.exceptions.UserNotFoundException;
 import com.blog.model.User;
 import com.blog.payloads.UserDTO;
 import com.blog.repositories.UserRepo;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	
-	@Autowired
-	private UserRepo userRepo;
-	
-	@Autowired
-	private ModelMapper modelMapper;
+	private final UserRepo userRepo;
+	private final ModelMapper modelMapper;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public UserDTO createUser(UserDTO userDto) {
-		User user = this.dtoToEntity(userDto);
-		User savedUser = userRepo.save(user);
-		return this.entityToDto(savedUser);
+		Optional<User> existingUser = userRepo.findByEmail(userDto.getEmail());
+		if(existingUser.isPresent()) {
+			new DuplicateDataFoundException("User already exists with this email: " + userDto.getEmail());
+		}
+		
+		String hashedPass = passwordEncoder.encode(userDto.getPassword());
+		userDto.setPassword(hashedPass);
+		
+		User newUser = modelMapper.map(userDto, User.class);
+		
+		User savedUser = userRepo.save(newUser);
+		
+		return modelMapper.map(savedUser, UserDTO.class);
 	}
 
 	@Override
-	public UserDTO updateUser(UserDTO userDto, Integer userID) throws UserNotFoundException {
-		User user = this.userRepo.findById(userID).orElseThrow(() -> new UserNotFoundException("User with id " + userID + " does not exists"));
+	public UserDTO updateUser(UserDTO userDto, Integer userId) {
+		User existingUser = userRepo.findById(userId)
+				.orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exists"));
 		
-		user.setName(userDto.getName());
-		user.setEmail(userDto.getEmail());
-		user.setAbout(userDto.getAbout());
-		user.setPassword(userDto.getPassword());
+		User newUser = modelMapper.map(userDto, User.class);
+		if(existingUser != null && newUser != null) {
+			updateData(existingUser, newUser);
+		}
 		
-		User updatedUser = this.userRepo.save(user);
+		User updatedUser = userRepo.save(existingUser);
 		
-		return this.entityToDto(updatedUser);
+		return modelMapper.map(updatedUser, UserDTO.class);
+	}
+	
+	public void updateData(User existingUser, User newUser) {
+		existingUser.setName(newUser.getName());
+		existingUser.setEmail(newUser.getEmail());
+		existingUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+		existingUser.setAbout(newUser.getAbout());
 	}
 
 	@Override
-	public UserDTO getUserById(Integer userID) throws UserNotFoundException {
-		User user = this.userRepo.findById(userID).orElseThrow(() -> new UserNotFoundException("User with id " + userID + " does not exists"));
+	public UserDTO getUserById(Integer userId) {
+		User user = userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exists"));
 		
-		return this.entityToDto(user);
+		return modelMapper.map(user, UserDTO.class);
 	}
 
 	@Override
 	public List<UserDTO> getAllUsers() {
 		List<User> users = this.userRepo.findAll();
 		
-		List<UserDTO> userDtoUpdated = users.stream().map(user -> this.entityToDto(user)).collect(Collectors.toList());
+		List<UserDTO> updatedUsersDtos = users.stream()
+				.map(user -> modelMapper.map(user, UserDTO.class))
+				.collect(Collectors.toList());
 		
 		
-		return userDtoUpdated;
+		return updatedUsersDtos;
 	}
 
 	@Override
-	public void deleteUser(Integer userID) throws UserNotFoundException {
-		User user = this.userRepo.findById(userID).orElseThrow(() -> new UserNotFoundException("User with id " + userID + " does not exists"));
+	public void deleteUser(Integer userId) {
+		User user = this.userRepo.findById(userId)
+				.orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exists"));
 		
-		this.userRepo.delete(user);
-	}
-	
-	public User dtoToEntity(UserDTO userDto) {
-//		User user = new User();
-//		user.setId(userDto.getId());
-//		user.setName(userDto.getName());
-//		user.setEmail(userDto.getEmail());
-//		user.setAbout(userDto.getAbout());
-//		user.setPassword(userDto.getPassword());
-		
-		User user = this.modelMapper.map(userDto, User.class);
-		
-		return user;
-	}
-	
-	public UserDTO entityToDto(User user) {
-		
-		// Let say 1stClass - User, 2ndClass - UserDTO
-		// modelMapper.map(1stClass, 2ndClass)
-		UserDTO userDto = this.modelMapper.map(user, UserDTO.class);
-		
-		return userDto;
+		userRepo.delete(user);
 	}
 
 	@Override
 	public UserDetailsService userDetailsService() {
-		
 		return new UserDetailsService() {
-			
 			@Override
-			public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-				return userRepo.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found with email"));
+			public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+				return userRepo.findByEmail(email)
+						.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 			}
 		};
 	}
