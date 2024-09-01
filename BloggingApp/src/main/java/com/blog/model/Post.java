@@ -15,6 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,17 +32,22 @@ public class Post {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@Column(length = 200, nullable = false)
+	@Column(nullable = false)
+	@NotBlank(message = "Title is mandatory")
+	@Size(min = 10, message = "Title should be at least 10 characters long")
 	private String title;
 	
-	@Column(length = 10000, nullable = false)
+	@Column(nullable = false)
+	@NotBlank(message = "Content is mandatory")
+	@Size(min = 50, message = "Content should be at least 50 characters long")
 	private String content;
 	
 	@Column(nullable = false)
 	private String imageName;
 	
 	@Column(nullable = false)
-	private LocalDateTime publishedDate;
+	@NotNull(message = "Publish date cannot be null")
+	private LocalDateTime publishedDate = LocalDateTime.now();
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="categ_id", nullable = false)
