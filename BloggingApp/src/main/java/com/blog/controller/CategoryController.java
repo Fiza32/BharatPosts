@@ -2,7 +2,6 @@ package com.blog.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,50 +18,47 @@ import com.blog.payloads.CategoryDto;
 import com.blog.services.CategoryServiceImpl;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 	
-	@Autowired
-	private CategoryServiceImpl categoryService;
+	private final CategoryServiceImpl categoryService;
 
-	// create
 	@PostMapping("/")
 	public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto catDto){
-		CategoryDto categDto = this.categoryService.createCategory(catDto);
-		return new ResponseEntity<CategoryDto>(categDto, HttpStatus.CREATED);
+		CategoryDto categDto = categoryService.createCategory(catDto);
+		
+		return new ResponseEntity<>(categDto, HttpStatus.CREATED);
 	}
 	
-	// update
 	@PutMapping("/{catId}")
 	public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto catDto, @PathVariable Integer catId){
-		CategoryDto updatedCategDto = this.categoryService.updateCategoryById(catDto, catId);
+		CategoryDto updatedCategDto = categoryService.updateCategory(catDto, catId);
 		
-		return new ResponseEntity<CategoryDto>(updatedCategDto, HttpStatus.OK);
+		return new ResponseEntity<>(updatedCategDto, HttpStatus.OK);
 	}
 	
-	// delete
 	@DeleteMapping("/{catId}")
 	public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Integer catId){
-		this.categoryService.deleteCategory(catId);
+		categoryService.deleteCategory(catId);
 		
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Category is deleted", true), HttpStatus.OK);
+		return new ResponseEntity<>(new ApiResponse("Category is deleted", true), HttpStatus.OK);
 	}
 	
-	// get
 	@GetMapping("/{catId}")
 	public ResponseEntity<CategoryDto> getCategory(@PathVariable Integer catId){
-		CategoryDto categDto = this.categoryService.getCategoryById(catId);
+		CategoryDto categDto = categoryService.getCategoryById(catId);
 		
-		return new ResponseEntity<CategoryDto>(categDto, HttpStatus.OK);
+		return new ResponseEntity<>(categDto, HttpStatus.OK);
 	}
 	
-	// getAll
 	@GetMapping("/")
 	public ResponseEntity<List<CategoryDto>> getCategories(){
-		List<CategoryDto> categDtoList = this.categoryService.getAllCategories();
+		List<CategoryDto> categDtoList = categoryService.getAllCategories();
 		
-		return new ResponseEntity<List<CategoryDto>>(categDtoList, HttpStatus.OK);
+		return new ResponseEntity<>(categDtoList, HttpStatus.OK);
 	}
 }
