@@ -4,73 +4,94 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.blog.exceptions.CategoryNotFoundException;
+import com.blog.exceptions.DuplicateDataFoundException;
+import com.blog.exceptions.ResourceNotFoundException;
 import com.blog.model.Category;
 import com.blog.payloads.CategoryDto;
 import com.blog.repositories.CategoryRepo;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-	@Autowired
-	private CategoryRepo categoryRepo;
+	private final CategoryRepo categoryRepo;
+	private final ModelMapper modelMapper;
 	
-	@Autowired
-	private ModelMapper modelMapper;
+	private static final Logger LOGGER = LoggerFactory.getLogger(CategoryServiceImpl.class);
 	
 	@Override
 	public CategoryDto createCategory(CategoryDto categoryDto) {
-		// TODO Auto-generated method stub
-		Category cat = this.modelMapper.map(categoryDto, Category.class);
-		Category addedCat = this.categoryRepo.save(cat);
+		if(categoryRepo.findByTitle(categoryDto.getTitle()).isPresent()) {
+			LOGGER.info("Category already exists with the title: {}", categoryDto.getTitle());
+			
+			throw new DuplicateDataFoundException("Category already exists with the title: " + categoryDto.getTitle());
+		}
 		
-		return this.modelMapper.map(addedCat, CategoryDto.class);
+		Category category = convertToEntity(categoryDto);
+		Category savedCategory = categoryRepo.save(category);
+		
+		LOGGER.info("Category saved with title: {}", categoryDto.getTitle());
+		return convertToDto(savedCategory);
 	}
-
+	
 	@Override
 	public CategoryDto getCategoryById(Integer catId) {
-		// TODO Auto-generated method stub
-		Category cat = this.categoryRepo.findById(catId).orElseThrow(() -> new CategoryNotFoundException("Category with Id " + catId + " doesn't exists"));
+		Category category = categoryRepo.findById(catId)
+				.orElseThrow(() -> new ResourceNotFoundException("Category with Id " + catId + " doesn't exists"));
 		
-		CategoryDto catDto = this.modelMapper.map(cat, CategoryDto.class);
-		
-		return catDto;
+		return convertToDto(category);
 	}
 
 	@Override
 	public List<CategoryDto> getAllCategories() {
-		// TODO Auto-generated method stub
-		List<Category> categories = this.categoryRepo.findAll();
+		List<Category> categories = categoryRepo.findAll();
 		
-		List<CategoryDto> catDtos = categories.stream().map(cat -> this.modelMapper.map(cat, CategoryDto.class)).collect(Collectors.toList());
-		
-		return catDtos;
+		return categories
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public CategoryDto updateCategoryById(CategoryDto categoryDto, Integer catId) {
-		// TODO Auto-generated method stub
-Category cat = this.categoryRepo.findById(catId).orElseThrow(() -> new CategoryNotFoundException("Category with Id " + catId + " doesn't exists"));
+	public CategoryDto updateCategory(CategoryDto categoryDto, Integer catId) {
+	Category category = categoryRepo.findById(catId)
+		.orElseThrow(() -> {
+			LOGGER.error("Category not found with id: {}", catId);
+			return new ResourceNotFoundException("Category not found with id: " + catId);
+		});
 		
-		cat.setTitle(categoryDto.getCategoryTitle());
-		cat.setDescription(categoryDto.getCategoryDescription());
+		category.setTitle(categoryDto.getTitle());
+		category.setDescription(categoryDto.getDescription());
 		
-		Category updatedCat = this.categoryRepo.save(cat);
+		Category updatedCategory = categoryRepo.save(category);
 		
-		return this.modelMapper.map(updatedCat, CategoryDto.class);
+		LOGGER.info("Category updated with id: {}", catId);
+		return convertToDto(updatedCategory);
 	}
 
 	@Override
 	public void deleteCategory(Integer catId) {
-		// TODO Auto-generated method stub
-		Category cat = this.categoryRepo.findById(catId).orElseThrow(() -> new CategoryNotFoundException("Category with Id " + catId + " doesn't exists"));
+		Category category = categoryRepo.findById(catId)
+			.orElseThrow(() -> {
+				LOGGER.error("Category not found with id: {}", catId);
+				return new ResourceNotFoundException("Category not found with id: " + catId);
+			});
 		
-		this.categoryRepo.delete(cat);
-		
-		
+		categoryRepo.delete(category);
+		LOGGER.info("Category deleted with id: {}", catId);
 	}
-
+	
+	private CategoryDto convertToDto(Category category) {
+		return modelMapper.map(category, CategoryDto.class);
+	}
+	
+	private Category convertToEntity(CategoryDto categoryDto) {
+		return modelMapper.map(categoryDto, Category.class);
+	}
 }
