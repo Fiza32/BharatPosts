@@ -23,7 +23,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,17 +38,23 @@ import lombok.Setter;
 public class User implements UserDetails{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	
 	@Column(nullable = false)
+	@NotBlank(message = "Name is mandatory")
 	private String name;
 	
 	@Column(nullable = false, unique = true)
+	@NotBlank(message = "Email is mandatory")
+	@Email(message = "Email should be valid")
 	private String email;
 	
 	@Column(nullable = false)
+	@NotBlank(message = "Password is mandatory")
+	@Size(min = 6, message = "Password should be at least 6 characters long")
 	private String password;
 	
+	@NotBlank(message = "Write few words about yourself")
 	private String about;
 	
 	@Enumerated(EnumType.STRING)
