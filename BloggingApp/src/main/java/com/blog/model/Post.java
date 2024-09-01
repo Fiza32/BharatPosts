@@ -1,6 +1,6 @@
 package com.blog.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,14 +39,14 @@ public class Post {
 	private String imageName;
 	
 	@Column(nullable = false)
-	private Date publishedDate;
+	private LocalDateTime publishedDate;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="id", nullable = false)
+	@JoinColumn(name="categ_id", nullable = false)
 	private Category category;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
