@@ -6,17 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class CategoryDto {
 
-	private Integer categoryId;
-	@NotBlank(message = "Category title can't be empty")
-	@Size(min = 5, max = 50, message="Title size must be between 5 to 50")
-	private String categoryTitle;
+	private Integer id;
 	
-	@NotBlank(message = "Category Description can't be empty")
-	@Size(min = 15, max = 250, message="Description size must be between 15 to 250")
-	private String categoryDescription;
+	@NotBlank(message = "Title is mandatory")
+	@Size(min = 10, message="Title should be at least of 10 characters long")
+	private String title;
+	
+	@NotBlank(message = "Description is mandatory")
+	@Size(min = 15, message="Description should be at least of 10 characters long")
+	private String description;
 }
