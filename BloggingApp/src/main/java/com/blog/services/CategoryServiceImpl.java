@@ -55,8 +55,8 @@ public class CategoryServiceImpl implements CategoryService {
 		// TODO Auto-generated method stub
 Category cat = this.categoryRepo.findById(catId).orElseThrow(() -> new CategoryNotFoundException("Category with Id " + catId + " doesn't exists"));
 		
-		cat.setCategoryTitle(categoryDto.getCategoryTitle());
-		cat.setCategoryDescription(categoryDto.getCategoryDescription());
+		cat.setTitle(categoryDto.getCategoryTitle());
+		cat.setDescription(categoryDto.getCategoryDescription());
 		
 		Category updatedCat = this.categoryRepo.save(cat);
 		
