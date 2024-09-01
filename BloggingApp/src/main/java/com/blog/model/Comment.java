@@ -9,13 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Comment {
 
 	@Id
@@ -23,6 +27,8 @@ public class Comment {
 	private int id;
 	
 	@Column(nullable = false)
+	@NotBlank(message = "Comment can't be empty")
+	@Size(min = 5, message = "Comment should be at least 5 characters long")
 	private String content;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
