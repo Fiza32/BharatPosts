@@ -9,9 +9,13 @@ import com.blog.model.Post;
 import com.blog.model.User;
 
 public interface PostRepo extends JpaRepository<Post, Integer> {
-	List<Post> findByUser(User user);
-	
-	List<Post> findByCategory(Category category);
-	
-	List<Post> findByTitleContaining(String title);
+
+    // Find posts by user
+    List<Post> findAllByUser(User user);
+
+    // Find posts by category
+    List<Post> findAllByCategory(Category category);
+
+    // Find posts where the title contains the given string
+    List<Post> findAllByTitleContainingIgnoreCase(String title);
 }
