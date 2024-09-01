@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.blog.exceptions.InvalidInputException;
 import com.blog.exceptions.UserNotFoundException;
@@ -20,6 +21,7 @@ import com.blog.repositories.UserRepo;
 import lombok.RequiredArgsConstructor;
 
 
+@Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService{
 	private final UserRepo userRepo;
