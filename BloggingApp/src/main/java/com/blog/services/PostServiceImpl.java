@@ -2,19 +2,19 @@ package com.blog.services;
 
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.blog.exceptions.UserNotFoundException;
+import com.blog.exceptions.ResourceNotFoundException;
 import com.blog.model.Category;
 import com.blog.model.Post;
 import com.blog.model.User;
@@ -24,129 +24,163 @@ import com.blog.repositories.CategoryRepo;
 import com.blog.repositories.PostRepo;
 import com.blog.repositories.UserRepo;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 	
-	@Autowired
-	private PostRepo postRepo;
+	private final PostRepo postRepo;
+	private final UserRepo userRepo;
+	private final CategoryRepo categoryRepo;
+	private final ModelMapper modelMapper;
 	
-	@Autowired
-	private UserRepo userRepo;
+	private static final Logger LOGGER = LoggerFactory.getLogger(PostServiceImpl.class);
 	
-	@Autowired
-	private CategoryRepo categoryRepo;
-	
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
-	public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId) throws UserNotFoundException {
+	public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId) {
+		LOGGER.info("Creating post with title: {}", postDto.getTitle());
 		
-		User user = this.userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exists"));
+		User user = userRepo.findById(userId)
+				.orElseThrow(() -> {
+					LOGGER.error("User with id {} does not exist", userId);
+					
+					return new ResourceNotFoundException("User with id " + userId + " does not exists");
+				});
 		
-		Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new UserNotFoundException("Category with id " + categoryId + " does not exists"));
+		Category category = categoryRepo.findById(categoryId)
+				.orElseThrow(() -> {
+					LOGGER.error("Category with id {} does not exist", categoryId);
+					
+					return new ResourceNotFoundException("Category with id " + categoryId + " does not exists");
+				});
 		
-		Post post = this.modelMapper.map(postDto, Post.class);
+		Post post = modelMapper.map(postDto, Post.class);
 		post.setImageName("default.png");
 		post.setPublishedDate(LocalDateTime.now());
+		
 		post.setUser(user);
 		post.setCategory(category);
 		
-		Post newPost =  this.postRepo.save(post);
-		return this.modelMapper.map(newPost, PostDto.class);
+		Post newPost =  postRepo.save(post);
+		LOGGER.info("Post created successfully with id: {}", newPost.getId());
+		
+		return convertToDto(newPost);
 	}
 
 	@Override
-	public PostDto updatePost(PostDto postDto, Integer postId) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new UserNotFoundException("Post with id " + postId + " does not exists"));
+	public PostDto updatePost(PostDto postDto, Integer postId) {
+		Post post = postRepo.findById(postId)
+				.orElseThrow(() -> {
+					LOGGER.error("Post with id {} does not exists", postId);
+					return new ResourceNotFoundException("Post with id " + postId + " does not exists");
+				});
 		
 		post.setTitle(postDto.getTitle());
 		post.setContent(postDto.getContent());
-		post.setImageName(postDto.getImagename());
 		
-		Post updatedPost = this.postRepo.save(post);
-		return this.modelMapper.map(updatedPost, PostDto.class);
+		Post updatedPost = postRepo.save(post);
+		LOGGER.info("Post updated successfully with id: {}", postId);
+		
+		return modelMapper.map(updatedPost, PostDto.class);
 	}
 
 	@Override
-	public PostDto getPostById(Integer postId) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new UserNotFoundException("Post with id " + postId + " does not exists"));
+	public PostDto getPostById(Integer postId) {
+		Post post = postRepo.findById(postId)
+				.orElseThrow(() -> {
+					LOGGER.error("Post with id {} does not exists", postId);
+					return new ResourceNotFoundException("Post with id " + postId + " does not exists");
+				});
 		
-		return this.modelMapper.map(post, PostDto.class);
+		return convertToDto(post);
 	}
 
 	@Override
 	public PostResponse getAllPosts(int pageNum, int pageSize, String sortBy, String sortDirection) {
-		
 		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 		
-//		if(sortDirection.equalsIgnoreCase("asc")) {
-//			sort = Sort.by(sortBy).ascending();
-//		} 
-//		else {
-//			sort = Sort.by(sortBy).descending();
-//		}
+		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 		
-		Pageable pgl = PageRequest.of(pageNum, pageSize, sort);
+		Page<Post> postPage = postRepo.findAll(pageable);
 		
-		Page<Post> pagePost = this.postRepo.findAll(pgl);
+		List<Post> posts = postPage.getContent();
 		
-		List<Post> allPosts = pagePost.getContent();
+		List<PostDto> postDtos = posts
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
 		
-		List<PostDto> postDtos = allPosts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
-		
+		return createPostResponse(postDtos, postPage);
+	}
+	
+	public PostResponse createPostResponse(List<PostDto> postDtos, Page<Post> postPage) {
 		PostResponse postResponse = new PostResponse();
 		postResponse.setContent(postDtos);
-		postResponse.setPageNumber(pagePost.getNumber());
-		postResponse.setPageSize(pagePost.getSize());
-		postResponse.setTotalElements(pagePost.getTotalElements());
-		postResponse.setTotalPages(pagePost.getTotalPages());
-		postResponse.setLastPage(pagePost.isLast());
+		postResponse.setPageNumber(postPage.getNumber());
+		postResponse.setPageSize(postPage.getSize());
+		postResponse.setTotalElements(postPage.getTotalElements());
+		postResponse.setTotalPages(postPage.getTotalPages());
+		postResponse.setLastPage(postPage.isLast());
 		
 		return postResponse;
 	}
 
 	@Override
-	public List<PostDto> getAllPostsByCategory(Integer categoryId) throws UserNotFoundException {
-		Category category = this.categoryRepo.findById(categoryId).orElseThrow(() -> new UserNotFoundException("Category with id " + categoryId + " does not exists"));
+	public List<PostDto> getAllPostsByCategory(Integer categoryId) {
+		Category category = this.categoryRepo.findById(categoryId)
+				.orElseThrow(() -> {
+					LOGGER.info("Category with id {} does not exists", categoryId);
+					return new ResourceNotFoundException("Category with id " + categoryId + " does not exists");
+				});
 		
-		List<Post> posts = this.postRepo.findByCategory(category);
+		List<Post> posts = postRepo.findAllByCategory(category);
 		
-		List<PostDto> postDto = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
-		
-		return postDto;
+		return posts
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<PostDto> getAllPostsByUser(Integer userId) throws UserNotFoundException {
-		User user = this.userRepo.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exists"));
+	public List<PostDto> getAllPostsByUser(Integer userId) {
+		User user = userRepo.findById(userId)
+				.orElseThrow(() -> {
+					LOGGER.error("User with id {} does not exists", userId);
+					return new ResourceNotFoundException("User with id " + userId + " does not exists");
+				});
 		
-		List<Post> posts = this.postRepo.findByUser(user);
+		List<Post> posts = postRepo.findAllByUser(user);
 		
-		List<PostDto> postDto = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
-		
-		return postDto;
+		return posts
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
 	}
-
-
-	@Override
-	public void deletePost(Integer postId) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		Post post = this.postRepo.findById(postId).orElseThrow(() -> new UserNotFoundException("Post with id " + postId + " does not exists"));
-		
-		this.postRepo.delete(post);
-	}
-
 	
 	@Override
+	public void deletePost(Integer postId) {
+		Post post = postRepo.findById(postId)
+				.orElseThrow(() -> {
+					LOGGER.error("Post with id {} does not exists", postId);
+					return new ResourceNotFoundException("Post with id " + postId + " does not exists");
+				});
+		
+		postRepo.delete(post);
+		LOGGER.info("Post successfully deleted with id: {}", postId);
+	}
+
+	@Override
 	public List<PostDto> searchPost(String keyword) {
-		// TODO Auto-generated method stub
-		List<Post> posts = this.postRepo.findByTitleContaining(keyword);
-		List<PostDto> postDtos = posts.stream().map((post) -> this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
+		List<Post> posts = this.postRepo.findAllByTitleContainingIgnoreCase(keyword);
 		
-		
-		return postDtos;
+		return posts
+				.stream()
+				.map(this::convertToDto)
+				.collect(Collectors.toList());
+	}
+	
+	private PostDto convertToDto(Post post) {
+		return modelMapper.map(post, PostDto.class);
 	}
 }
