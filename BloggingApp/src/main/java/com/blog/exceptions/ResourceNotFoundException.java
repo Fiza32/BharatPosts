@@ -1,8 +1,8 @@
 package com.blog.exceptions;
 
-public class CategoryNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends RuntimeException {
 
-	public CategoryNotFoundException(String msg) {
+	public ResourceNotFoundException(String msg) {
 		super(msg);
 	}
 }
