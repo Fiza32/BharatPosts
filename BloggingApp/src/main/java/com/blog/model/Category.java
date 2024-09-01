@@ -17,22 +17,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
+@Table(name="categories")
 @Getter
 @Setter
-@Table(name="categories")
+@NoArgsConstructor
 public class Category {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer categoryId;
+	private Integer id;
 	
-	@Column(name="title", length = 100, nullable=false)
-	private String categoryTitle;
+	@Column(length = 100, nullable=false)
+	private String title;
 	
-	@Column(name="description")
-	private String categoryDescription;
+	@Column(length = 500)
+	private String description;
 	
-	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Post> posts = new ArrayList<>();
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private final List<Post> posts = new ArrayList<>();
 }
