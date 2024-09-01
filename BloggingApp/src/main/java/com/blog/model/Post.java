@@ -7,6 +7,7 @@ import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,34 +20,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="post")
+@Table(name="posts")
 @Getter
 @Setter
 @NoArgsConstructor
 public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer postId;
+	private Integer id;
 	
-	@Column(name="post_title", length = 200, nullable = false)
+	@Column(length = 200, nullable = false)
 	private String title;
 	
-	@Column(name="post_content", length = 10000, nullable = false)
+	@Column(length = 10000, nullable = false)
 	private String content;
 	
-	@Column(name="post_image_name", nullable = false)
+	@Column(nullable = false)
 	private String imageName;
 	
-	@Column(name="post_published_date", nullable = false)
-	private Date addedDate;
+	@Column(nullable = false)
+	private Date publishedDate;
 	
-	@ManyToOne
-	@JoinColumn(name="category_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="id", nullable = false)
 	private Category category;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id", nullable = false)
 	private User user;
 	
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-	private Set<Comment> comments = new HashSet<>();
+	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+	private final Set<Comment> comments = new HashSet<>();
 }
