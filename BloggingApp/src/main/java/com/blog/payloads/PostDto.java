@@ -1,10 +1,11 @@
 package com.blog.payloads;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,21 +15,24 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class PostDto {
-	private Integer postId;
+	private Integer id;
 	
-	@NotBlank(message = "Post title must not be blank")
-	@Size(min = 10, max = 50, message = "Post title length should be between 10 and 50")
+	@NotBlank(message = "Title is mandatory")
+	@Size(min = 10, message = "Title should be at least 10 characters long")
 	private String title;
 	
-	@NotBlank(message = "Post description must not be blank")
-	@Size(min = 50, message = "Post description should be atleast of 50 characters")
+	@NotBlank(message = "Content is mandatory")
+	@Size(min = 50, message = "Content should be at least 50 characters long")
 	private String content;
 	
 	private String imagename;
-	private Date addedDate;
-	private CategoryDto category;
-	private UserDTO user;
 	
-	private Set<CommentDto> comments = new HashSet<>();
+	@NotNull(message = "Publish date cannot be null")
+	private LocalDateTime publishedDate;
+	
+	private CategoryDto categoryDto;
+	private UserDTO userDto;
+	
+	private final Set<CommentDto> comments = new HashSet<>();
 }
  
