@@ -9,9 +9,10 @@ import com.blog.payloads.UserDTO;
 
 public interface UserService {
 	UserDTO createUser(UserDTO userDto);
-	UserDTO updateUser(UserDTO userDto, Integer userID) throws UserNotFoundException;
-	UserDTO getUserById(Integer userID) throws UserNotFoundException;
+	UserDTO updateUser(UserDTO userDto, Integer userId);
+	UserDTO getUserById(Integer userId);
 	List<UserDTO> getAllUsers();
-	void deleteUser(Integer userID) throws UserNotFoundException;
+	void deleteUser(Integer userId);
+	
 	UserDetailsService userDetailsService();
 }
